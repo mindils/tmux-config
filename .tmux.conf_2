@@ -1,0 +1,104 @@
+# ----------------------------
+# Основные настройки
+# ----------------------------
+unbind C-b
+set -g prefix C-a
+set -g mouse on
+set -g renumber-windows on          # Автоматическая перенумерация окон
+set -g base-index 1                 # Нумерация окон/панелей с 1
+setw -g pane-base-index 1
+
+# ----------------------------
+# Терминал и производительность
+# ----------------------------
+set -g default-terminal "xterm-256color"
+set -ag terminal-overrides ",xterm-256color:RGB"  # Полноцветная поддержка
+set -sg escape-time 0               # Убираем задержку ESC
+set -g history-limit 50000          # Увеличиваем историю прокрутки
+set -g focus-events on              # Для лучшей интеграции с neovim
+
+# ----------------------------
+# Навигация и управление
+# ----------------------------
+# Vim-стиль навигации
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+# Перемещение панелей
+bind J swap-pane -D
+bind K swap-pane -U
+
+# Разделение окон с сохранением пути
+bind | split-window -h -c "#{pane_current_path}"
+bind - split-window -v -c "#{pane_current_path}"
+
+# Быстрое изменение размера панелей
+bind -r H resize-pane -L 5
+bind -r J resize-pane -D 5
+bind -r K resize-pane -U 5
+bind -r L resize-pane -R 5
+
+# ----------------------------
+# Копирование и мышь (Vim-режим)
+# ----------------------------
+setw -g mode-keys vi                # Режим копирования как в Vim
+bind-key -T copy-mode-vi v send -X begin-selection
+bind-key -T copy-mode-vi y send -X copy-selection-and-cancel
+bind-key -T copy-mode-vi i send -X cancel           # Выход по 'i'
+bind-key -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection-and-cancel
+
+# ----------------------------
+# Внешний вид и статусбар
+# ----------------------------
+set -g status-position top
+set -g status-interval 1            # Обновление статуса каждую секунду
+
+# Catppuccin Theme
+set -g @catppuccin_window_left_separator ""
+set -g @catppuccin_window_right_separator " "
+set -g @catppuccin_window_middle_separator " █"
+set -g @catppuccin_window_number_position "right"
+
+set -g @catppuccin_window_default_fill "number"
+set -g @catppuccin_window_default_text "#W"
+
+set -g @catppuccin_window_current_fill "number"
+set -g @catppuccin_window_current_text "#W"
+
+set -g @catppuccin_status_modules_right "directory date_time session"
+set -g @catppuccin_status_left_separator  " "
+set -g @catppuccin_status_right_separator ""
+set -g @catppuccin_status_fill "icon"
+set -g @catppuccin_status_connect_separator "no"
+set -g @catppuccin_directory_text "#{pane_current_path}"
+# ----------------------------
+# Плагины
+# ----------------------------
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'catppuccin/tmux'
+set -g @plugin 'tmux-plugins/tmux-yank'       # Копирование в системный буфер
+set -g @plugin 'tmux-plugins/tmux-resurrect'  # Сохранение сессий
+set -g @plugin 'tmux-plugins/tmux-continuum'  # Автосохранение
+
+# Настройки плагинов
+set -g @resurrect-capture-pane-contents 'on'
+set -g @continuum-restore 'on'
+set -g @yank_action 'copy-pipe'      # Для MacOS
+
+# ----------------------------
+# Дополнительные настройки
+# ----------------------------
+# Перезагрузка конфига
+unbind r
+bind r source-file ~/.tmux.conf \; display "Config reloaded!"
+
+# Оболочка по умолчанию
+set-option -g default-shell /bin/zsh
+
+# Очистка истории
+bind -n C-l send-keys C-l \; run 'sleep 0.1' \; clear-history
+
+# Инициализация TPM (должна быть последней)
+run '~/.tmux/plugins/tpm/tpm'
